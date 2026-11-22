@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generator Laporan Periodik Harian PUSDALOPS PB BPBD Provinsi Papua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            pusdalops: {
+              navy: '#0f2942',
+              slate: '#1e3a5f',
+              amber: '#d97706',
+              amberLight: '#fef3c7',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-only-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+      }
+
+      #reportOutput {
+        white-space: pre-wrap !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11pt !important;
+        line-height: 1.45 !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+        border: none !important;
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
+  <!-- Top Operational Header -->
+  <header
+    class="no-print bg-pusdalops-navy dark:bg-slate-900 text-white shadow-md border-b border-slate-700/70 sticky top-0 z-30">
+    <div
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div
+          class="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+          <img
+            src="logo-bpbd.png"
+            alt="Logo BPBD PUSDALOPS PB Provinsi Papua"
+            class="w-full h-full object-contain"
+            onerror="this.style.display='none'"
+          />
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight truncate">
+              PUSDALOPS PB
+            </h1>
+            <span
+              class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+              BPBD Provinsi Papua
+            </span>
+          </div>
+          <p class="text-xs text-slate-300 truncate">
+            Sistem Laporan Periodik Harian
+          </p>
+        </div>
+      </div>
+
+      <!-- Theme Toggle & Live Status -->
+      <div class="flex items-center gap-2.5 self-start sm:self-auto">
+        <span id="liveWitClock"
+          class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-slate-800/80 text-sky-300 border border-slate-700">
+          WIT --:--
+        </span>
+
+        <button type="button" id="themeToggleBtn"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600/80 transition cursor-pointer"
+          title="Ganti Tema Terang / Gelap">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel">Mode Gelap</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Banner -->
+  <div id="toastBanner"
+    class="no-print fixed bottom-5 right-5 z-50 max-w-sm w-full pointer-events-none opacity-0 translate-y-2 transition-all duration-200 px-4 sm:px-0">
+    <div id="toastInner"
+      class="pointer-events-auto rounded-xl px-4 py-3 shadow-lg border flex items-center justify-between gap-3 text-sm font-medium bg-slate-900 text-white border-slate-700">
+      <span id="toastMessage">Pesan sistem</span>
+      <button type="button" id="toastCloseBtn" class="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
+        aria-label="Tutup notifikasi">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Roster Manager Modal (Kelola Daftar Regu) -->
+  <div id="rosterModal"
+    class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4">
+    <div
+      class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Kelola Daftar Regu Piket (Regu 1 – Regu 4)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Sesuaikan nama Supervisor dan daftar anggota tiap regu.
+            Tersimpan permanen di perangkat ini.</p>
+        </div>
+        <button type="button" id="closeRosterModalBtn"
+          class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300 cursor-pointer"
+          aria-label="Tutup modal">
+          ✕
+        </button>
+      </div>
+
+      <div id="rosterEditorContainer" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Populated by JS -->
+      </div>
+
+      <div
+        class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/70 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" id="resetRostersDefaultBtn"
+          class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900 transition cursor-pointer">
+          Kembalikan Regu Bawaan
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="cancelRosterModalBtn"
+            class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:opacity-90 transition cursor-pointer">
+            Batal
+          </button>
+          <button type="button" id="saveRostersBtn"
+            class="px-4 py-2 rounded-xl text-xs font-semibold bg-pusdalops-navy hover:bg-pusdalops-slate text-white shadow-sm transition cursor-pointer">
+            Simpan Daftar Regu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- Top Action Toolbar -->
+    <section
+      class="no-print bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" id="copyReportBtn"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-pusdalops-navy hover:bg-pusdalops-slate text-white shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          <span>Salin Teks Laporan</span>
+        </button>
+
+        <button type="button" id="saveHistoryBtn"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          <span>Simpan ke Riwayat</span>
+        </button>
+
+        <button type="button" id="downloadTxtBtn"
+          class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Unduh .TXT</span>
+        </button>
+
+        <button type="button" id="printReportBtn"
+          class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          <span>Cetak / PDF</span>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" id="resetDefaultBtn"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition cursor-pointer">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          <span>Reset Form</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Two-Column Form + Live Preview -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- LEFT COLUMN: Structured Form Inputs (7 cols) -->
+      <section class="no-print lg:col-span-7 space-y-5">
+        <form id="reportForm" class="space-y-5" onsubmit="return false;">
+          <!-- 1. Waktu Pemantauan & Regu Cepat -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-pusdalops-navy text-white text-xs font-bold flex items-center justify-center">1</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Waktu Pemantauan (WIT)</h2>
+              </div>
+              <button type="button" id="useNowWitBtn"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 dark:text-amber-200 bg-amber-100/80 dark:bg-amber-900/50 hover:bg-amber-200/80 dark:hover:bg-amber-800/60 px-3 py-1.5 rounded-xl border border-amber-300/80 dark:border-amber-700 transition cursor-pointer">
+                <span>⏱ Gunakan Tanggal &amp; Jam Sekarang (WIT)</span>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="tgl_hari" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Hari &amp; Tanggal
+                </label>
+                <input id="tgl_hari" name="tgl_hari" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                  placeholder="Contoh: Sabtu, 21 November 2026" />
+              </div>
+
+              <div>
+                <label for="waktu_pantau" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Jam Pemantauan (WIT)
+                </label>
+                <input id="waktu_pantau" name="waktu_pantau" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                  placeholder="Contoh: 18.00 WIT" />
+              </div>
+            </div>
+
+            <!-- Shift Quick Chips -->
+            <div class="mt-3 flex flex-wrap items-center gap-1.5">
+              <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mr-1">Shift Cepat:</span>
+              <button type="button" data-shift="08.00 WIT"
+                class="shift-chip px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-pusdalops-navy hover:text-white dark:hover:bg-amber-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">08.00
+                WIT</button>
+              <button type="button" data-shift="12.00 WIT"
+                class="shift-chip px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-pusdalops-navy hover:text-white dark:hover:bg-amber-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">12.00
+                WIT</button>
+              <button type="button" data-shift="18.00 WIT"
+                class="shift-chip px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-pusdalops-navy hover:text-white dark:hover:bg-amber-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">18.00
+                WIT</button>
+              <button type="button" data-shift="00.00 WIT"
+                class="shift-chip px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-pusdalops-navy hover:text-white dark:hover:bg-amber-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">00.00
+                WIT</button>
+            </div>
+          </div>
+
+          <!-- 2. A. Status Kejadian Bencana -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-rose-700 text-white text-xs font-bold flex items-center justify-center">A</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Status Kejadian Bencana</h2>
+              </div>
+
+              <!-- Toggle NIHIL vs Kejadian Terkonfirmasi -->
+              <div
+                class="inline-flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <button type="button" id="modeNihilBtn"
+                  class="px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                  NIHIL
+                </button>
+                <button type="button" id="modeKejadianBtn"
+                  class="px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                  Kejadian Terkonfirmasi
+                </button>
+              </div>
+            </div>
+
+            <!-- Structured Disaster Fields (Visible when Kejadian Terkonfirmasi is active) -->
+            <div id="kejadianStructuredBox"
+              class="hidden mb-4 p-3.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/70 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-rose-800 dark:text-rose-300">Rincian Kejadian (Otomatis menyusun
+                  teks di bawah)</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="kejadian_jenis"
+                    class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Jenis
+                    Kejadian</label>
+                  <input id="kejadian_jenis" type="text" placeholder="Contoh: Banjir / Tanah Longsor"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                  <label for="kejadian_lokasi"
+                    class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Lokasi (Distrik /
+                    Kab / Kota)</label>
+                  <input id="kejadian_lokasi" type="text" placeholder="Contoh: Distrik Abepura, Kota Jayapura"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                  <label for="kejadian_waktu"
+                    class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Waktu
+                    Kejadian</label>
+                  <input id="kejadian_waktu" type="text" placeholder="Contoh: Pukul 14.30 WIT"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                  <label for="kejadian_dampak"
+                    class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Dampak / Penanganan
+                    Awal</label>
+                  <input id="kejadian_dampak" type="text" placeholder="Contoh: 15 rumah tergenang, TRC dalam kaji cepat"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-slate-900 dark:text-white" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label for="status_bencana" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Teks Status Kejadian Bencana (Bisa diedit langsung)
+              </label>
+              <textarea id="status_bencana" name="status_bencana" rows="2"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                placeholder="NIHIL (Belum ada laporan kejadian bencana terkonfirmasi)"></textarea>
+            </div>
+          </div>
+
+          <!-- 3. B. Ringkasan Cuaca Kota Jayapura (BMKG) -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-sky-700 text-white text-xs font-bold flex items-center justify-center">B</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Ringkasan Cuaca Kota Jayapura
+                  (BMKG)</h2>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <div class="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                  <label for="cuaca_jpr_umum" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Kondisi Umum
+                  </label>
+                  <div class="flex flex-wrap gap-1">
+                    <button type="button" data-umum="Cerah Berawan hingga Berawan"
+                      class="umum-chip text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer">Cerah
+                      Berawan</button>
+                    <button type="button" data-umum="Berawan hingga berpotensi Hujan Ringan menjelang malam"
+                      class="umum-chip text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer">Berawan
+                      - Hujan Ringan</button>
+                    <button type="button" data-umum="Hujan Ringan hingga Hujan Sedang"
+                      class="umum-chip text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer">Hujan
+                      Ringan - Sedang</button>
+                  </div>
+                </div>
+                <input id="cuaca_jpr_umum" name="cuaca_jpr_umum" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition" />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label for="cuaca_jpr_suhu"
+                    class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Suhu
+                  </label>
+                  <input id="cuaca_jpr_suhu" name="cuaca_jpr_suhu" type="text"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                    placeholder="24–28°C" />
+                </div>
+
+                <div>
+                  <label for="cuaca_jpr_lembap"
+                    class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Kelembapan
+                  </label>
+                  <input id="cuaca_jpr_lembap" name="cuaca_jpr_lembap" type="text"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                    placeholder="75 – 98%" />
+                </div>
+
+                <div>
+                  <label for="cuaca_jpr_angin"
+                    class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Kecepatan &amp; Arah Angin
+                  </label>
+                  <input id="cuaca_jpr_angin" name="cuaca_jpr_angin" type="text"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                    placeholder="3–10 km/jam, dari arah Timur Laut" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. C. Dinamika Cuaca 9 Wilayah (BMKG) -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-indigo-700 text-white text-xs font-bold flex items-center justify-center">C</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Dinamika Cuaca 9 Wilayah
+                  (BMKG)</h2>
+              </div>
+            </div>
+
+            <div id="wilayahInputsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+
+          <!-- 5. D. Kegiatan Operasional Pusdalops -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-emerald-700 text-white text-xs font-bold flex items-center justify-center">D</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Kegiatan Operasional Pusdalops
+                </h2>
+              </div>
+              <button type="button" id="resetGiatBtn"
+                class="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-2.5 py-1 rounded-lg transition cursor-pointer">
+                Teks Standar
+              </button>
+            </div>
+
+            <div class="space-y-3.5">
+              <div>
+                <label for="giat_peringatan"
+                  class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  1. Peringatan Dini
+                </label>
+                <input id="giat_peringatan" name="giat_peringatan" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition" />
+              </div>
+
+              <div>
+                <label for="giat_monitoring"
+                  class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  2. Monitoring Wilayah
+                </label>
+                <input id="giat_monitoring" name="giat_monitoring" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition" />
+              </div>
+
+              <div>
+                <label for="giat_admin_log" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  3. Administrasi &amp; Logistik
+                </label>
+                <input id="giat_admin_log" name="giat_admin_log" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. E. Petugas Piket & Quick Regu Presets -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="w-7 h-7 rounded-lg bg-amber-600 text-white text-xs font-bold flex items-center justify-center">E</span>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Petugas Piket (Preset Regu
+                  Otomatis)</h2>
+              </div>
+              <button type="button" id="openRosterModalBtn"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-pusdalops-navy dark:text-amber-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 transition cursor-pointer">
+                <span>⚙ Kelola Daftar Regu</span>
+              </button>
+            </div>
+
+            <!-- 1-Click Regu Selector Buttons -->
+            <div class="mb-4">
+              <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2">
+                Pilih Regu Piket (1-Klik Isi Supervisor &amp; Anggota):
+              </span>
+              <div id="reguPresetButtons" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="piket_supervisor"
+                  class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Supervisor
+                </label>
+                <input id="piket_supervisor" name="piket_supervisor" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                  placeholder="Nama Supervisor" />
+              </div>
+
+              <div>
+                <label for="piket_regu" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Tim Operator / Regu
+                </label>
+                <input id="piket_regu" name="piket_regu" type="text"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                  placeholder="Contoh: Regu 2" />
+              </div>
+            </div>
+
+            <div>
+              <label for="piket_anggota" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Daftar Operator Piket (satu nama per baris; penomoran otomatis)
+              </label>
+              <textarea id="piket_anggota" name="piket_anggota" rows="5"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40 transition"
+                placeholder="1. Pieter Dusay&#10;2. Melkianus Giay..."></textarea>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- RIGHT COLUMN: Live Formatted Report Output (5 cols) -->
+      <section class="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
+        <div
+          class="print-only-container bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+          <div
+            class="no-print px-5 py-3.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Pratinjau Laporan Siap Kirim</h2>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Format WhatsApp / Telegram Pusdalops Papua</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="charCountBadge"
+                class="text-[11px] font-mono bg-slate-200/70 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-md">
+                0 karakter
+              </span>
+              <button type="button" id="copyInlineBtn"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pusdalops-navy hover:bg-pusdalops-slate text-white transition cursor-pointer">
+                Salin
+              </button>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5">
+            <pre id="reportOutput"
+              class="font-mono text-xs sm:text-[13px] leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50/90 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 whitespace-pre-wrap break-words max-h-[70vh] overflow-y-auto select-all"></pre>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOTTOM SECTION: Comprehensive History Archive & Export/Import System -->
+    <section
+      class="no-print bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-5 space-y-4">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              Arsip &amp; Riwayat Laporan Harian
+            </h2>
+            <span id="historyCountBadge"
+              class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              0 Laporan
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Simpan log laporan harian, cari berdasarkan tanggal/regu/status, dan ekspor ke CSV (Excel), JSON, atau arsip
+            TXT gabungan.
+          </p>
+        </div>
+
+        <!-- Multi-Format Export & Import Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" id="exportCsvBtn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition cursor-pointer">
+            <span>📊 Ekspor CSV (Excel)</span>
+          </button>
+
+          <button type="button" id="exportTxtArchiveBtn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 transition cursor-pointer">
+            <span>📄 Ekspor Arsip .TXT</span>
+          </button>
+
+          <button type="button" id="exportJsonBtn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition cursor-pointer">
+            <span>💾 Backup JSON</span>
+          </button>
+
+          <label for="importJsonInput"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">
+            <span>📥 Impor JSON</span>
+            <input id="importJsonInput" type="file" accept=".json,application/json" class="hidden" />
+          </label>
+
+          <button type="button" id="clearHistoryBtn"
+            class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900 transition cursor-pointer">
+            <span>Hapus Semua</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <div class="sm:col-span-6">
+          <input id="historySearchInput" type="text"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/40 dark:focus:ring-amber-500/40"
+            placeholder="Cari tanggal, supervisor, regu, atau isi kejadian..." />
+        </div>
+
+        <div class="sm:col-span-3">
+          <select id="historyFilterRegu" aria-label="Filter berdasarkan Regu"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none">
+            <option value="">Semua Regu</option>
+            <option value="Regu 1">Regu 1</option>
+            <option value="Regu 2">Regu 2</option>
+            <option value="Regu 3">Regu 3</option>
+            <option value="Regu 4">Regu 4</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-3">
+          <select id="historyFilterStatus" aria-label="Filter berdasarkan Status Kejadian"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none">
+            <option value="">Semua Status Kejadian</option>
+            <option value="NIHIL">NIHIL</option>
+            <option value="KEJADIAN">Ada Kejadian</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- History Table / Cards -->
+      <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-xs sm:text-sm">
+          <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold">
+            <tr>
+              <th class="px-4 py-3">Waktu Pemantauan</th>
+              <th class="px-4 py-3">Status Kejadian</th>
+              <th class="px-4 py-3">Ringkasan Cuaca 9 Wilayah</th>
+              <th class="px-4 py-3">Regu &amp; Supervisor</th>
+              <th class="px-4 py-3 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"
+            class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer
+    class="no-print mt-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 px-4 sm:px-6 lg:px-8">
+    <div
+      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+      <span>PUSDALOPS BPBD PROVINSI PAPUA • Kontak: +62 821-9041-100</span>
+      <span>Seluruh jadwal regu &amp; riwayat laporan tersimpan lokal di browser</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY_HISTORY = 'pusdalops_papua_report_history_v2';
+      const STORAGE_KEY_DRAFT = 'pusdalops_papua_report_draft_v2';
+      const STORAGE_KEY_ROSTERS = 'pusdalops_papua_rosters_v2';
+      const STORAGE_KEY_THEME = 'pusdalops_papua_theme_v1';
+
+      const WILAYAH_LIST = [
+        { key: 'cuaca_kab_jpr', label: 'Kab. Jayapura' },
+        { key: 'cuaca_yapen', label: 'Kepulauan Yapen' },
+        { key: 'cuaca_biak', label: 'Biak Numfor' },
+        { key: 'cuaca_sarmi', label: 'Sarmi' },
+        { key: 'cuaca_keerom', label: 'Keerom' },
+        { key: 'cuaca_waropen', label: 'Waropen' },
+        { key: 'cuaca_supiori', label: 'Supiori' },
+        { key: 'cuaca_mamberamo', label: 'Mamberamo Raya' },
+        { key: 'cuaca_kota_jpr', label: 'Kota Jayapura' },
+      ];
+
+      const CUACA_OPTIONS = [
+        'Cerah Berawan',
+        'Berawan',
+        'Berawan Tebal',
+        'Hujan Ringan',
+        'Hujan Sedang',
+        'Hujan Lebat',
+        'Hujan Petir',
+      ];
+
+      const DEFAULT_ROSTERS = {
+        'Regu 1': {
+          supervisor: 'M. Sandy,SE',
+          anggota: [
+            '1. Bilardo A. Amijaya',
+            '2. Onesimus Fonataba',
+            '3. Sultan K. Pitang',
+            '4. Ramses G. Dulanlebit',
+            '5. Petrus Mandowen',
+          ].join('\n'),
+        },
+        'Regu 2': {
+          supervisor: 'M. Sandy,SE',
+          anggota: [
+            '1. Pieter Dusay',
+            '2. Melkianus Giay',
+            '3. Faisal A. H',
+            '4. Albert F. U',
+            '5. Hein Yan W. R',
+          ].join('\n'),
+        },
+        'Regu 3': {
+          supervisor: 'Supervisor Regu 3',
+          anggota: [
+            '1. Operator 1 Regu 3',
+            '2. Operator 2 Regu 3',
+            '3. Operator 3 Regu 3',
+            '4. Operator 4 Regu 3',
+          ].join('\n'),
+        },
+        'Regu 4': {
+          supervisor: 'Supervisor Regu 4',
+          anggota: [
+            '1. Operator 1 Regu 4',
+            '2. Operator 2 Regu 4',
+            '3. Operator 3 Regu 4',
+            '4. Operator 4 Regu 4',
+          ].join('\n'),
+        },
+      };
+
+      const DEFAULT_STATE = {
+        tgl_hari: 'Jumat, 20 November 2026',
+        waktu_pantau: '18.00 WIT',
+        status_mode: 'NIHIL', // 'NIHIL' | 'KEJADIAN'
+        kejadian_jenis: '',
+        kejadian_lokasi: '',
+        kejadian_waktu: '',
+        kejadian_dampak: '',
+        status_bencana: 'NIHIL (Belum ada laporan kejadian bencana terkonfirmasi)',
+        cuaca_jpr_umum: 'Berawan hingga berpotensi Hujan Ringan menjelang malam',
+        cuaca_jpr_suhu: '24–28°C',
+        cuaca_jpr_lembap: '75 – 98%',
+        cuaca_jpr_angin: '3–10 km/jam, dari arah Timur Laut',
+        cuaca_kab_jpr: 'Hujan Ringan',
+        cuaca_yapen: 'Hujan Ringan',
+        cuaca_biak: 'Hujan Ringan',
+        cuaca_sarmi: 'Hujan Ringan',
+        cuaca_keerom: 'Hujan Ringan',
+        cuaca_waropen: 'Hujan Ringan',
+        cuaca_supiori: 'Berawan',
+        cuaca_mamberamo: 'Hujan Ringan',
+        cuaca_kota_jpr: 'Hujan Ringan',
+        giat_peringatan: 'Penyebarluasan informasi cuaca dan potensi bencana via medsos dan radio komunikasi.',
+        giat_monitoring: 'Pemantauan intensif di 8 kabupaten dan 1 kota se-Provinsi Papua.',
+        giat_admin_log: 'Pengolahan data kebencanaan dan pemeliharaan/pengecekan kesiapan peralatan PB.',
+        piket_supervisor: 'M. Sandy',
+        piket_regu: 'Regu 2',
+        piket_anggota: DEFAULT_ROSTERS['Regu 2'].anggota,
+      };
+
+      let state = { ...DEFAULT_STATE };
+      let rosters = JSON.parse(JSON.stringify(DEFAULT_ROSTERS));
+      let toastTimeout = null;
+
+      // DOM Elements
+      const wilayahContainer = document.getElementById('wilayahInputsContainer');
+      const reportOutputEl = document.getElementById('reportOutput');
+      const charCountBadge = document.getElementById('charCountBadge');
+      const historyTableBody = document.getElementById('historyTableBody');
+      const historyCountBadge = document.getElementById('historyCountBadge');
+      const toastBanner = document.getElementById('toastBanner');
+      const toastInner = document.getElementById('toastInner');
+      const toastMessage = document.getElementById('toastMessage');
+
+      /* ---------------- THEME MANAGEMENT ---------------- */
+      function applyTheme(theme) {
+        const htmlEl = document.documentElement;
+        const iconEl = document.getElementById('themeIcon');
+        const labelEl = document.getElementById('themeLabel');
+        if (theme === 'dark') {
+          htmlEl.classList.add('dark');
+          if (iconEl) iconEl.textContent = '☀️';
+          if (labelEl) labelEl.textContent = 'Mode Terang';
+        } else {
+          htmlEl.classList.remove('dark');
+          if (iconEl) iconEl.textContent = '🌙';
+          if (labelEl) labelEl.textContent = 'Mode Gelap';
+        }
+        try {
+          localStorage.setItem(STORAGE_KEY_THEME, theme);
+        } catch (_) { }
+      }
+
+      function initTheme() {
+        let saved = 'light';
+        try {
+          saved = localStorage.getItem(STORAGE_KEY_THEME) || 'light';
+        } catch (_) { }
+        applyTheme(saved);
+      }
+
+      /* ---------------- LIVE WIT CLOCK ---------------- */
+      function updateLiveWitClock() {
+        const clockEl = document.getElementById('liveWitClock');
+        if (!clockEl) return;
+        try {
+          const now = new Date();
+          const timeStr = new Intl.DateTimeFormat('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Jayapura',
+          }).format(now).replace(/:/g, '.');
+          clockEl.textContent = `${timeStr} WIT`;
+        } catch (_) { }
+      }
+
+      /* ---------------- TOAST FEEDBACK ---------------- */
+      function showToast(message, type = 'info') {
+        if (!toastBanner || !toastMessage || !toastInner) return;
+        toastMessage.textContent = message;
+
+        toastInner.className = 'pointer-events-auto rounded-xl px-4 py-3 shadow-lg border flex items-center justify-between gap-3 text-sm font-medium transition-colors';
+        if (type === 'success') {
+          toastInner.classList.add('bg-emerald-900', 'text-emerald-50', 'border-emerald-700');
+        } else if (type === 'warn') {
+          toastInner.classList.add('bg-amber-950', 'text-amber-100', 'border-amber-700');
+        } else {
+          toastInner.classList.add('bg-slate-900', 'text-white', 'border-slate-700');
+        }
+
+        toastBanner.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+        toastBanner.classList.add('opacity-100', 'translate-y-0');
+
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(hideToast, 3200);
+      }
+
+      function hideToast() {
+        if (!toastBanner) return;
+        toastBanner.classList.remove('opacity-100', 'translate-y-0');
+        toastBanner.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+      }
+
+      /* ---------------- ROSTER (REGU 1-4) MANAGEMENT ---------------- */
+      function loadRosters() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_ROSTERS);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            rosters = { ...JSON.parse(JSON.stringify(DEFAULT_ROSTERS)), ...parsed };
+          }
+        } catch (_) {
+          rosters = JSON.parse(JSON.stringify(DEFAULT_ROSTERS));
+        }
+      }
+
+      function saveRostersToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY_ROSTERS, JSON.stringify(rosters));
+        } catch (_) { }
+      }
+
+      function renderReguPresetButtons() {
+        const container = document.getElementById('reguPresetButtons');
+        if (!container) return;
+        container.innerHTML = '';
+
+        Object.keys(rosters).forEach((reguName) => {
+          const isActive = (state.piket_regu || '').trim().toLowerCase() === reguName.toLowerCase();
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = isActive
+            ? 'px-3 py-2 rounded-xl text-xs font-bold bg-pusdalops-navy text-white border border-pusdalops-navy shadow-xs transition cursor-pointer text-left'
+            : 'px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-left';
+
+          const supName = rosters[reguName]?.supervisor || '-';
+          btn.innerHTML = `
+            <div class="font-bold">${reguName}</div>
+            <div class="text-[10px] opacity-80 truncate">Spv: ${escapeHtml(supName)}</div>
+          `;
+
+          btn.addEventListener('click', () => {
+            const selected = rosters[reguName];
+            if (!selected) return;
+            state.piket_regu = reguName;
+            state.piket_supervisor = selected.supervisor;
+            state.piket_anggota = selected.anggota;
+            syncFormFromState();
+            persistDraft();
+            showToast(`${reguName} diterapkan (Supervisor & Anggota terisi)`, 'success');
+          });
+
+          container.appendChild(btn);
+        });
+      }
+
+      function openRosterModal() {
+        const modal = document.getElementById('rosterModal');
+        const container = document.getElementById('rosterEditorContainer');
+        if (!modal || !container) return;
+
+        container.innerHTML = '';
+        Object.keys(rosters).forEach((reguKey) => {
+          const card = document.createElement('div');
+          card.className = 'p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/60 space-y-2.5';
+
+          const heading = document.createElement('div');
+          heading.className = 'text-xs font-bold text-pusdalops-navy dark:text-amber-300 uppercase tracking-wide';
+          heading.textContent = reguKey;
+
+          const supLabel = document.createElement('label');
+          supLabel.className = 'block text-[11px] font-semibold text-slate-700 dark:text-slate-300';
+          supLabel.textContent = 'Nama Supervisor';
+
+          const supInput = document.createElement('input');
+          supInput.type = 'text';
+          supInput.dataset.reguKey = reguKey;
+          supInput.dataset.field = 'supervisor';
+          supInput.value = rosters[reguKey]?.supervisor || '';
+          supInput.className = 'w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs text-slate-900 dark:text-white';
+
+          const memLabel = document.createElement('label');
+          memLabel.className = 'block text-[11px] font-semibold text-slate-700 dark:text-slate-300';
+          memLabel.textContent = 'Daftar Anggota (1 baris = 1 petugas)';
+
+          const memArea = document.createElement('textarea');
+          memArea.rows = 5;
+          memArea.dataset.reguKey = reguKey;
+          memArea.dataset.field = 'anggota';
+          memArea.value = rosters[reguKey]?.anggota || '';
+          memArea.className = 'w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs text-slate-900 dark:text-white font-mono';
+
+          card.appendChild(heading);
+          card.appendChild(supLabel);
+          card.appendChild(supInput);
+          card.appendChild(memLabel);
+          card.appendChild(memArea);
+          container.appendChild(card);
+        });
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function closeRosterModal() {
+        const modal = document.getElementById('rosterModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      /* ---------------- DISASTER STATUS MODE ---------------- */
+      function updateStatusModeUI() {
+        const modeNihilBtn = document.getElementById('modeNihilBtn');
+        const modeKejadianBtn = document.getElementById('modeKejadianBtn');
+        const structuredBox = document.getElementById('kejadianStructuredBox');
+
+        const isNihil = state.status_mode !== 'KEJADIAN';
+        if (modeNihilBtn && modeKejadianBtn) {
+          if (isNihil) {
+            modeNihilBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-xs transition cursor-pointer';
+            modeKejadianBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer';
+          } else {
+            modeKejadianBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white shadow-xs transition cursor-pointer';
+            modeNihilBtn.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer';
+          }
+        }
+
+        if (structuredBox) {
+          if (isNihil) {
+            structuredBox.classList.add('hidden');
+          } else {
+            structuredBox.classList.remove('hidden');
+          }
+        }
+      }
+
+      function composeKejadianFromStructured() {
+        if (state.status_mode !== 'KEJADIAN') return;
+        const jenis = (state.kejadian_jenis || '').trim();
+        const lokasi = (state.kejadian_lokasi || '').trim();
+        const waktu = (state.kejadian_waktu || '').trim();
+        const dampak = (state.kejadian_dampak || '').trim();
+
+        const parts = [];
+        if (jenis) parts.push(`Kejadian ${jenis}`);
+        if (lokasi) parts.push(`di ${lokasi}`);
+        if (waktu) parts.push(`(${waktu})`);
+        let composed = parts.join(' ');
+        if (dampak) {
+          composed = composed ? `${composed}. Dampak/Penanganan: ${dampak}` : dampak;
+        }
+        if (composed) {
+          state.status_bencana = composed;
+          const statusEl = document.getElementById('status_bencana');
+          if (statusEl) statusEl.value = composed;
+        }
+      }
+
+      /* ---------------- 9 REGIONS WEATHER INPUTS ---------------- */
+      function renderWilayahInputs() {
+        if (!wilayahContainer) return;
+        wilayahContainer.innerHTML = '';
+
+        WILAYAH_LIST.forEach((item) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'bg-slate-50/80 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-xl p-2.5';
+
+          const label = document.createElement('label');
+          label.setAttribute('for', item.key);
+          label.className = 'block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1 truncate';
+          label.textContent = item.label;
+
+          const select = document.createElement('select');
+          select.id = item.key;
+          select.name = item.key;
+          select.className = 'w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pusdalops-navy/30 transition';
+
+          const currentVal = state[item.key] || 'Berawan';
+          const optionsSet = new Set([...CUACA_OPTIONS]);
+          if (currentVal && !optionsSet.has(currentVal)) {
+            optionsSet.add(currentVal);
+          }
+
+          optionsSet.forEach((optText) => {
+            const opt = document.createElement('option');
+            opt.value = optText;
+            opt.textContent = optText;
+            if (optText === currentVal) opt.selected = true;
+            select.appendChild(opt);
+          });
+
+          select.addEventListener('change', (e) => {
+            state[item.key] = e.target.value;
+            persistDraft();
+            renderReport();
+          });
+
+          wrapper.appendChild(label);
+          wrapper.appendChild(select);
+          wilayahContainer.appendChild(wrapper);
+        });
+      }
+
+      /* ---------------- REPORT TEXT BUILDER ---------------- */
+      function formatAnggotaPiket(rawText) {
+        const lines = (rawText || '')
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+
+        if (lines.length === 0) return '-';
+
+        return lines
+          .map((line, idx) => {
+            if (/^\d+[\.)]\s*/.test(line)) {
+              return line.replace(/^(\d+)\)\s*/, '$1. ');
+            }
+            return `${idx + 1}. ${line}`;
+          })
+          .join('\n');
+      }
+
+      function buildReportText(data = state) {
+        const tglHari = (data.tgl_hari || '').trim() || '-';
+        const waktuPantau = (data.waktu_pantau || '').trim() || '-';
+        const statusBencana = (data.status_bencana || '').trim() || '-';
+
+        const umum = (data.cuaca_jpr_umum || '').trim() || '-';
+        const suhu = (data.cuaca_jpr_suhu || '').trim() || '-';
+        const lembap = (data.cuaca_jpr_lembap || '').trim() || '-';
+        const angin = (data.cuaca_jpr_angin || '').trim() || '-';
+
+        const wilayahLines = WILAYAH_LIST.map((w) => {
+          const val = (data[w.key] || '').trim() || '-';
+          return `   ● ${w.label} : ${val}`;
+        }).join('\n');
+
+        const giat1 = (data.giat_peringatan || '').trim() || '-';
+        const giat2 = (data.giat_monitoring || '').trim() || '-';
+        const giat3 = (data.giat_admin_log || '').trim() || '-';
+
+        const supervisor = (data.piket_supervisor || '').trim() || '-';
+        const regu = (data.piket_regu || '').trim() || '-';
+        const anggotaFormatted = formatAnggotaPiket(data.piket_anggota);
+
+        return [
+          'LAPORAN PERIODIK HARIAN PUSDALOPS PB BPBD PROVINSI PAPUA',
+          `Waktu Pemantauan: ${tglHari} | ${waktuPantau}`,
+          '',
+          'Kepada Yth:',
+          '1. Kepala BNPB',
+          '2. Gubernur Provinsi Papua',
+          '3. Sekda Provinsi Papua (Ka. BPBD Ex-Officio)',
+          '4. Kalaksa BPBD Provinsi Papua',
+          '',
+          '*A. STATUS KEJADIAN BENCANA :*',
+          ` ${statusBencana}`,
+          '',
+          '*B. RINGKASAN CUACA KOTA JAYAPURA (BMKG):*',
+          `   ● Kondisi Umum : ${umum}`,
+          `   ● Suhu : ${suhu} | Kelembapan: ${lembap} | Kecepatan Angin: ${angin}`,
+          '',
+          '*C. DINAMIKA CUACA WILAYAH (BMKG):*',
+          wilayahLines,
+          '',
+          '*D. KEGIATAN OPERASIONAL PUSDALOPS:*',
+          `1.Peringatan Dini: ${giat1}`,
+          `2. Monitoring Wilayah: ${giat2}`,
+          `3. Administrasi & Logistik: ${giat3}`,
+          '',
+          '*E. PETUGAS PIKET:*',
+          `● Supervisor : ${supervisor}`,
+          `● Tim Operator : ${regu}`,
+          anggotaFormatted,
+          '',
+          'Demikian laporan disampaikan. Pemantauan terus dilakukan dan perkembangan lebih lanjut akan dilaporkan pada kesempatan pertama.',
+          '',
+          'PUSDALOPS BPBD PROVINSI PAPUA',
+          'Kontak : +62 821-9041-100',
+        ].join('\n');
+      }
+
+      function renderReport() {
+        const text = buildReportText(state);
+        if (reportOutputEl) reportOutputEl.textContent = text;
+        if (charCountBadge) charCountBadge.textContent = `${text.length} karakter`;
+      }
+
+      function syncFormFromState() {
+        const fieldIds = [
+          'tgl_hari',
+          'waktu_pantau',
+          'kejadian_jenis',
+          'kejadian_lokasi',
+          'kejadian_waktu',
+          'kejadian_dampak',
+          'status_bencana',
+          'cuaca_jpr_umum',
+          'cuaca_jpr_suhu',
+          'cuaca_jpr_lembap',
+          'cuaca_jpr_angin',
+          'giat_peringatan',
+          'giat_monitoring',
+          'giat_admin_log',
+          'piket_supervisor',
+          'piket_regu',
+          'piket_anggota',
+        ];
+
+        fieldIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el && typeof state[id] === 'string') {
+            el.value = state[id];
+          }
+        });
+
+        updateStatusModeUI();
+        renderReguPresetButtons();
+        renderWilayahInputs();
+        renderReport();
+      }
+
+      /* ---------------- CLIPBOARD & FILE DOWNLOAD HELPERS ---------------- */
+      async function copyTextToClipboard(text, successMsg = 'Teks laporan berhasil disalin!') {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            showToast(successMsg, 'success');
+            return;
+          }
+        } catch (_) { }
+
+        try {
+          const tempArea = document.createElement('textarea');
+          tempArea.value = text;
+          tempArea.setAttribute('readonly', '');
+          tempArea.style.position = 'fixed';
+          tempArea.style.left = '-9999px';
+          document.body.appendChild(tempArea);
+          tempArea.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(tempArea);
+          if (ok) {
+            showToast(successMsg, 'success');
+          } else {
+            showToast('Silakan blok dan salin manual dari kotak pratinjau', 'warn');
+          }
+        } catch (_) {
+          showToast('Gagal menyalin otomatis. Salin manual dari pratinjau.', 'warn');
+        }
+      }
+
+      function triggerDownload(filename, content, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function sanitizeFilenamePart(str) {
+        return (str || 'laporan')
+          .replace(/[^a-zA-Z0-9_-]+/g, '_')
+          .replace(/^_+|_+$/g, '')
+          .slice(0, 45) || 'laporan';
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      /* ---------------- HISTORY ARCHIVE & EXPORT/IMPORT ---------------- */
+      function summarizeWeatherCounts(snapshot) {
+        let hujan = 0;
+        let berawan = 0;
+        WILAYAH_LIST.forEach((w) => {
+          const val = (snapshot?.[w.key] || '').toLowerCase();
+          if (val.includes('hujan')) hujan += 1;
+          else berawan += 1;
+        });
+        return { hujan, berawan };
+      }
+
+      function getHistoryEntries() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
+          if (!raw) return [];
+          const list = JSON.parse(raw);
+          return Array.isArray(list) ? list : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function setHistoryEntries(list) {
+        localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list));
+      }
+
+      function saveCurrentToHistory() {
+        const entries = getHistoryEntries();
+        const now = new Date();
+        const isNihil = (state.status_bencana || '').trim().toUpperCase().startsWith('NIHIL');
+        const weatherCounts = summarizeWeatherCounts(state);
+
+        const item = {
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          savedAt: now.toLocaleString('id-ID', { timeZone: 'Asia/Jayapura' }),
+          tglHari: state.tgl_hari || '-',
+          waktuPantau: state.waktu_pantau || '-',
+          regu: state.piket_regu || '-',
+          supervisor: state.piket_supervisor || '-',
+          statusSingkat: isNihil ? 'NIHIL' : 'KEJADIAN',
+          statusBencana: state.status_bencana || '-',
+          weatherCounts,
+          snapshot: { ...state },
+          text: buildReportText(state),
+        };
+
+        entries.unshift(item);
+        const trimmed = entries.slice(0, 100);
+
+        try {
+          setHistoryEntries(trimmed);
+          renderHistoryTable();
+          showToast('Laporan tersimpan ke Arsip Riwayat!', 'success');
+        } catch (_) {
+          showToast('Penyimpanan browser penuh. Ekspor & bersihkan sebagian riwayat.', 'warn');
+        }
+      }
+
+      function renderHistoryTable() {
+        if (!historyTableBody) return;
+        const allEntries = getHistoryEntries();
+        if (historyCountBadge) {
+          historyCountBadge.textContent = `${allEntries.length} Laporan`;
+        }
+
+        const searchQuery = (document.getElementById('historySearchInput')?.value || '').trim().toLowerCase();
+        const reguFilter = (document.getElementById('historyFilterRegu')?.value || '').trim().toLowerCase();
+        const statusFilter = (document.getElementById('historyFilterStatus')?.value || '').trim().toUpperCase();
+
+        const filtered = allEntries.filter((entry) => {
+          if (reguFilter && (entry.regu || '').toLowerCase() !== reguFilter) return false;
+          if (statusFilter && (entry.statusSingkat || '').toUpperCase() !== statusFilter) return false;
+          if (searchQuery) {
+            const haystack = [
+              entry.tglHari,
+              entry.waktuPantau,
+              entry.regu,
+              entry.supervisor,
+              entry.statusBencana,
+            ].join(' ').toLowerCase();
+            if (!haystack.includes(searchQuery)) return false;
+          }
+          return true;
+        });
+
+        historyTableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 5;
+          td.className = 'px-4 py-8 text-center text-xs text-slate-500 dark:text-slate-400';
+          td.textContent = allEntries.length === 0
+            ? 'Belum ada laporan tersimpan. Klik "Simpan ke Riwayat" di bilah atas untuk mulai mengarsipkan.'
+            : 'Tidak ada laporan yang cocok dengan filter pencarian.';
+          tr.appendChild(td);
+          historyTableBody.appendChild(tr);
+          return;
+        }
+
+        filtered.forEach((entry) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition';
+
+          // Col 1: Date & Time
+          const tdTime = document.createElement('td');
+          tdTime.className = 'px-4 py-3 align-top';
+          tdTime.innerHTML = `
+            <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(entry.tglHari)}</div>
+            <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">${escapeHtml(entry.waktuPantau)}</div>
+          `;
+
+          // Col 2: Disaster Status
+          const tdStatus = document.createElement('td');
+          tdStatus.className = 'px-4 py-3 align-top max-w-xs';
+          const isNihil = entry.statusSingkat === 'NIHIL';
+          const badgeClass = isNihil
+            ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+            : 'bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+          tdStatus.innerHTML = `
+            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-bold border ${badgeClass}">
+              ${isNihil ? 'NIHIL' : 'ADA KEJADIAN'}
+            </span>
+            <div class="text-[11px] text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">${escapeHtml(entry.statusBencana || '')}</div>
+          `;
+
+          // Col 3: Weather Summary (Hujan vs Berawan)
+          const counts = entry.weatherCounts || summarizeWeatherCounts(entry.snapshot || {});
+          const tdWeather = document.createElement('td');
+          tdWeather.className = 'px-4 py-3 align-top';
+          tdWeather.innerHTML = `
+            <div class="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                🌧 ${counts.hujan} Hujan
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                ⛅ ${counts.berawan} Berawan
+              </span>
+            </div>
+          `;
+
+          // Col 4: Regu & Supervisor
+          const tdRegu = document.createElement('td');
+          tdRegu.className = 'px-4 py-3 align-top';
+          tdRegu.innerHTML = `
+            <div class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(entry.regu)}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">Spv: ${escapeHtml(entry.supervisor || entry.snapshot?.piket_supervisor || '-')}</div>
+          `;
+
+          // Col 5: Actions
+          const tdActions = document.createElement('td');
+          tdActions.className = 'px-4 py-3 align-top text-right whitespace-nowrap';
+
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'inline-flex items-center gap-1.5';
+
+          const loadBtn = document.createElement('button');
+          loadBtn.type = 'button';
+          loadBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-pusdalops-navy hover:text-white dark:hover:bg-amber-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer';
+          loadBtn.textContent = 'Muat';
+          loadBtn.addEventListener('click', () => {
+            if (entry.snapshot) {
+              state = { ...DEFAULT_STATE, ...entry.snapshot };
+              syncFormFromState();
+              persistDraft();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              showToast(`Laporan "${entry.tglHari}" dimuat ke form`, 'info');
+            }
+          });
+
+          const copyBtn = document.createElement('button');
+          copyBtn.type = 'button';
+          copyBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition cursor-pointer';
+          copyBtn.textContent = 'Salin';
+          copyBtn.addEventListener('click', () => {
+            const txt = entry.text || buildReportText(entry.snapshot || state);
+            copyTextToClipboard(txt, 'Teks laporan arsip disalin!');
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'px-2 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition cursor-pointer';
+          delBtn.textContent = 'Hapus';
+          delBtn.addEventListener('click', () => {
+            const updated = getHistoryEntries().filter((x) => x.id !== entry.id);
+            setHistoryEntries(updated);
+            renderHistoryTable();
+            showToast('Item riwayat dihapus', 'info');
+          });
+
+          btnGroup.appendChild(loadBtn);
+          btnGroup.appendChild(copyBtn);
+          btnGroup.appendChild(delBtn);
+          tdActions.appendChild(btnGroup);
+
+          tr.appendChild(tdTime);
+          tr.appendChild(tdStatus);
+          tr.appendChild(tdWeather);
+          tr.appendChild(tdRegu);
+          tr.appendChild(tdActions);
+          historyTableBody.appendChild(tr);
+        });
+      }
+
+      function exportHistoryCsv() {
+        const entries = getHistoryEntries();
+        if (entries.length === 0) {
+          showToast('Belum ada data riwayat untuk diekspor ke CSV', 'warn');
+          return;
+        }
+
+        const headers = [
+          'Waktu Simpan',
+          'Hari & Tanggal',
+          'Jam WIT',
+          'Status Singkat',
+          'Detail Status Kejadian',
+          'Cuaca Umum Jayapura',
+          'Suhu',
+          'Kelembapan',
+          'Angin',
+          ...WILAYAH_LIST.map((w) => w.label),
+          'Supervisor',
+          'Regu Piket',
+          'Anggota Piket',
+        ];
+
+        const csvEscape = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+        const rows = entries.map((e) => {
+          const s = e.snapshot || {};
+          return [
+            e.savedAt,
+            e.tglHari,
+            e.waktuPantau,
+            e.statusSingkat,
+            e.statusBencana,
+            s.cuaca_jpr_umum,
+            s.cuaca_jpr_suhu,
+            s.cuaca_jpr_lembap,
+            s.cuaca_jpr_angin,
+            ...WILAYAH_LIST.map((w) => s[w.key] || ''),
+            s.piket_supervisor || e.supervisor,
+            s.piket_regu || e.regu,
+            (s.piket_anggota || '').replace(/\r?\n/g, ' | '),
+          ].map(csvEscape).join(',');
+        });
+
+        // UTF-8 BOM so Excel opens Indonesian characters cleanly
+        const bom = '\uFEFF';
+        const csvContent = bom + [headers.map(csvEscape).join(','), ...rows].join('\r\n');
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        triggerDownload(`Arsip_Laporan_Pusdalops_Papua_${dateStamp}.csv`, csvContent, 'text/csv;charset=utf-8;');
+        showToast('File CSV (Excel) berhasil diunduh!', 'success');
+      }
+
+      function exportHistoryTxtArchive() {
+        const entries = getHistoryEntries();
+        if (entries.length === 0) {
+          showToast('Belum ada data riwayat untuk diekspor ke TXT', 'warn');
+          return;
+        }
+
+        const divider = '\n============================================================\n\n';
+        const combined = entries
+          .map((e) => e.text || buildReportText(e.snapshot || state))
+          .join(divider);
+
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        triggerDownload(`Arsip_Gabungan_Pusdalops_Papua_${dateStamp}.txt`, combined, 'text/plain;charset=utf-8;');
+        showToast('Arsip gabungan .TXT berhasil diunduh!', 'success');
+      }
+
+      function exportHistoryJson() {
+        const entries = getHistoryEntries();
+        const payload = {
+          app: 'PUSDALOPS_PB_PAPUA_REPORT_GENERATOR',
+          exportedAt: new Date().toISOString(),
+          rosters,
+          history: entries,
+        };
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        triggerDownload(`Backup_Pusdalops_Papua_${dateStamp}.json`, JSON.stringify(payload, null, 2), 'application/json');
+        showToast('Backup JSON (Riwayat + Daftar Regu) diunduh!', 'success');
+      }
+
+      function importHistoryJson(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target?.result || '{}');
+            let importedCount = 0;
+
+            if (parsed.rosters && typeof parsed.rosters === 'object') {
+              rosters = { ...rosters, ...parsed.rosters };
+              saveRostersToStorage();
+              renderReguPresetButtons();
+            }
+
+            const incomingHistory = Array.isArray(parsed)
+              ? parsed
+              : Array.isArray(parsed.history)
+                ? parsed.history
+                : [];
+
+            if (incomingHistory.length > 0) {
+              const existing = getHistoryEntries();
+              const existingIds = new Set(existing.map((x) => x.id));
+              const merged = [...existing];
+
+              incomingHistory.forEach((item) => {
+                if (item && typeof item === 'object' && item.tglHari) {
+                  const id = item.id && !existingIds.has(item.id)
+                    ? item.id
+                    : `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+                  merged.unshift({ ...item, id });
+                  importedCount += 1;
+                }
+              });
+
+              setHistoryEntries(merged.slice(0, 150));
+              renderHistoryTable();
+            }
+
+            showToast(`Impor berhasil (${importedCount} laporan ditambahkan)`, 'success');
+          } catch (_) {
+            showToast('File JSON tidak valid atau rusak', 'warn');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      /* ---------------- DRAFT PERSISTENCE ---------------- */
+      function persistDraft() {
+        try {
+          localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(state));
+        } catch (_) { }
+      }
+
+      function loadDraft() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            state = { ...DEFAULT_STATE, ...parsed };
+          }
+        } catch (_) {
+          state = { ...DEFAULT_STATE };
+        }
+      }
+
+      /* ---------------- EVENT BINDINGS ---------------- */
+      function bindEvents() {
+        // Theme toggle
+        document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        // Standard inputs
+        const standardFields = [
+          'tgl_hari',
+          'waktu_pantau',
+          'status_bencana',
+          'cuaca_jpr_umum',
+          'cuaca_jpr_suhu',
+          'cuaca_jpr_lembap',
+          'cuaca_jpr_angin',
+          'giat_peringatan',
+          'giat_monitoring',
+          'giat_admin_log',
+          'piket_supervisor',
+          'piket_regu',
+          'piket_anggota',
+        ];
+
+        standardFields.forEach((id) => {
+          document.getElementById(id)?.addEventListener('input', (e) => {
+            state[id] = e.target.value;
+            if (id === 'piket_regu') renderReguPresetButtons();
+            persistDraft();
+            renderReport();
+          });
+        });
+
+        // Structured disaster fields
+        ['kejadian_jenis', 'kejadian_lokasi', 'kejadian_waktu', 'kejadian_dampak'].forEach((id) => {
+          document.getElementById(id)?.addEventListener('input', (e) => {
+            state[id] = e.target.value;
+            composeKejadianFromStructured();
+            persistDraft();
+            renderReport();
+          });
+        });
+
+        // Disaster mode toggle
+        document.getElementById('modeNihilBtn')?.addEventListener('click', () => {
+          state.status_mode = 'NIHIL';
+          state.status_bencana = 'NIHIL (Belum ada laporan kejadian bencana terkonfirmasi)';
+          const statusEl = document.getElementById('status_bencana');
+          if (statusEl) statusEl.value = state.status_bencana;
+          updateStatusModeUI();
+          persistDraft();
+          renderReport();
+          showToast('Status kejadian disetel ke NIHIL', 'success');
+        });
+
+        document.getElementById('modeKejadianBtn')?.addEventListener('click', () => {
+          state.status_mode = 'KEJADIAN';
+          updateStatusModeUI();
+          composeKejadianFromStructured();
+          persistDraft();
+          renderReport();
+        });
+
+        // "Gunakan Tanggal & Jam Sekarang (WIT)"
+        document.getElementById('useNowWitBtn')?.addEventListener('click', () => {
+          try {
+            const now = new Date();
+            const dateStr = new Intl.DateTimeFormat('id-ID', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              timeZone: 'Asia/Jayapura',
+            }).format(now);
+            const capitalizedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+            const timeStr = new Intl.DateTimeFormat('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+              timeZone: 'Asia/Jayapura',
+            }).format(now).replace(':', '.');
+
+            state.tgl_hari = capitalizedDate;
+            state.waktu_pantau = `${timeStr} WIT`;
+
+            const tglEl = document.getElementById('tgl_hari');
+            const jamEl = document.getElementById('waktu_pantau');
+            if (tglEl) tglEl.value = state.tgl_hari;
+            if (jamEl) jamEl.value = state.waktu_pantau;
+
+            persistDraft();
+            renderReport();
+            showToast(`Waktu WIT diperbarui: ${capitalizedDate} | ${timeStr} WIT`, 'success');
+          } catch (_) {
+            showToast('Gagal mengambil waktu WIT otomatis', 'warn');
+          }
+        });
+
+        // Shift quick chips
+        document.querySelectorAll('.shift-chip').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const shiftVal = btn.getAttribute('data-shift');
+            if (!shiftVal) return;
+            state.waktu_pantau = shiftVal;
+            const jamEl = document.getElementById('waktu_pantau');
+            if (jamEl) jamEl.value = shiftVal;
+            persistDraft();
+            renderReport();
+            showToast(`Jam pemantauan disetel ke ${shiftVal}`, 'info');
+          });
+        });
+
+        // Weather general condition quick chips
+        document.querySelectorAll('.umum-chip').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-umum');
+            if (!val) return;
+            state.cuaca_jpr_umum = val;
+            const umumEl = document.getElementById('cuaca_jpr_umum');
+            if (umumEl) umumEl.value = val;
+            persistDraft();
+            renderReport();
+          });
+        });
+
+        // Reset operational activities
+        document.getElementById('resetGiatBtn')?.addEventListener('click', () => {
+          state.giat_peringatan = DEFAULT_STATE.giat_peringatan;
+          state.giat_monitoring = DEFAULT_STATE.giat_monitoring;
+          state.giat_admin_log = DEFAULT_STATE.giat_admin_log;
+          syncFormFromState();
+          persistDraft();
+          showToast('Kegiatan operasional dikembalikan ke teks standar', 'info');
+        });
+
+        // Reset entire form
+        document.getElementById('resetDefaultBtn')?.addEventListener('click', () => {
+          state = { ...DEFAULT_STATE };
+          if (rosters['Regu 2']) {
+            state.piket_supervisor = rosters['Regu 2'].supervisor;
+            state.piket_anggota = rosters['Regu 2'].anggota;
+          }
+          syncFormFromState();
+          persistDraft();
+          showToast('Formulir dikembalikan ke pengaturan awal', 'info');
+        });
+
+        // Roster modal handlers
+        document.getElementById('openRosterModalBtn')?.addEventListener('click', openRosterModal);
+        document.getElementById('closeRosterModalBtn')?.addEventListener('click', closeRosterModal);
+        document.getElementById('cancelRosterModalBtn')?.addEventListener('click', closeRosterModal);
+
+        document.getElementById('saveRostersBtn')?.addEventListener('click', () => {
+          const container = document.getElementById('rosterEditorContainer');
+          if (!container) return;
+          container.querySelectorAll('[data-regu-key]').forEach((el) => {
+            const key = el.dataset.reguKey;
+            const field = el.dataset.field;
+            if (rosters[key] && field) {
+              rosters[key][field] = el.value;
+            }
+          });
+          saveRostersToStorage();
+
+          // If current selected regu matches one of the edited rosters, update live form too
+          const activeRegu = Object.keys(rosters).find(
+            (k) => k.toLowerCase() === (state.piket_regu || '').trim().toLowerCase()
+          );
+          if (activeRegu && rosters[activeRegu]) {
+            state.piket_supervisor = rosters[activeRegu].supervisor;
+            state.piket_anggota = rosters[activeRegu].anggota;
+            syncFormFromState();
+            persistDraft();
+          } else {
+            renderReguPresetButtons();
+          }
+
+          closeRosterModal();
+          showToast('Daftar Regu 1–4 berhasil disimpan!', 'success');
+        });
+
+        document.getElementById('resetRostersDefaultBtn')?.addEventListener('click', () => {
+          rosters = JSON.parse(JSON.stringify(DEFAULT_ROSTERS));
+          saveRostersToStorage();
+          openRosterModal();
+          renderReguPresetButtons();
+          showToast('Daftar Regu dikembalikan ke bawaan', 'info');
+        });
+
+        // Copy, Download TXT, Print, Save History
+        document.getElementById('copyReportBtn')?.addEventListener('click', () => {
+          copyTextToClipboard(buildReportText(state));
+        });
+        document.getElementById('copyInlineBtn')?.addEventListener('click', () => {
+          copyTextToClipboard(buildReportText(state));
+        });
+
+        document.getElementById('downloadTxtBtn')?.addEventListener('click', () => {
+          const text = buildReportText(state);
+          const namePart = sanitizeFilenamePart(`${state.tgl_hari}_${state.waktu_pantau}`);
+          triggerDownload(`Laporan_Pusdalops_Papua_${namePart}.txt`, text, 'text/plain;charset=utf-8;');
+          showToast('File laporan .TXT berhasil diunduh!', 'success');
+        });
+
+        document.getElementById('printReportBtn')?.addEventListener('click', () => {
+          window.print();
+        });
+
+        document.getElementById('saveHistoryBtn')?.addEventListener('click', saveCurrentToHistory);
+
+        // History Search & Filters
+        document.getElementById('historySearchInput')?.addEventListener('input', renderHistoryTable);
+        document.getElementById('historyFilterRegu')?.addEventListener('change', renderHistoryTable);
+        document.getElementById('historyFilterStatus')?.addEventListener('change', renderHistoryTable);
+
+        // History Export / Import / Clear
+        document.getElementById('exportCsvBtn')?.addEventListener('click', exportHistoryCsv);
+        document.getElementById('exportTxtArchiveBtn')?.addEventListener('click', exportHistoryTxtArchive);
+        document.getElementById('exportJsonBtn')?.addEventListener('click', exportHistoryJson);
+
+        document.getElementById('importJsonInput')?.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          importHistoryJson(file);
+          e.target.value = '';
+        });
+
+        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
+          try {
+            localStorage.removeItem(STORAGE_KEY_HISTORY);
+            renderHistoryTable();
+            showToast('Seluruh riwayat laporan lokal telah dihapus', 'info');
+          } catch (_) {
+            showToast('Gagal menghapus riwayat', 'warn');
+          }
+        });
+
+        document.getElementById('toastCloseBtn')?.addEventListener('click', hideToast);
+      }
+
+      /* ---------------- INITIALIZE APP ---------------- */
+      window.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        loadRosters();
+        loadDraft();
+        syncFormFromState();
+        bindEvents();
+        renderHistoryTable();
+        updateLiveWitClock();
+        setInterval(updateLiveWitClock, 1000);
+      });
+    })();
+  </script>
+
+  <footer class="mt-8 pt-4 pb-6 text-right text-xs text-slate-400 border-t border-slate-800 print:hidden">
+    Created by <span class="font-semibold text-black-200">Bilardo Agung Amijaya-Pusdalops PB Papua 2026</span>
+  </footer>
+</body>
+
+</html>
